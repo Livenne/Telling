@@ -1,54 +1,33 @@
 package com.livenne;
 
-import com.formdev.flatlaf.extras.FlatSVGIcon;
-import com.livenne.component.BorderContainer;
-import com.livenne.panels.ContentPanel;
-import com.livenne.panels.FunctionPanel;
-import com.livenne.panels.MainPanel;
-import com.livenne.panels.TitlePanel;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.livenne.model.CustomerProfile;
+import com.livenne.model.ResponseEntity;
+import com.livenne.panel.SignInPanel;
+import com.livenne.utils.Settings;
+import com.livenne.utils.StringUtils;
+import com.livenne.window.LoginWindow;
+import com.livenne.window.MainWindow;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.nio.file.Path;
-import java.util.Enumeration;
 
 public class Main {
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::window);
+        Application.run("E:\\Code\\Learn\\Telling\\src\\main\\resources\\data.db");
+        FlatLaf.setup(new FlatDarkLaf());
+        UIManager.put("Panel.background", Settings.COLOR_BACKGROUND_1);
+        SwingUtilities.invokeLater(() -> {
+            ResponseEntity res = Application.send("/account/verify", StringUtils.map("token", CustomerProfile.getToken()), null);
+            JsonNode map = new ObjectMapper().valueToTree(res.getPayload());
+            if (map.has("verify") && map.get("verify").asBoolean()) MainWindow.getInstance();
+            else LoginWindow.getInstance();
+        });
+
 
     }
-    private static void window(){
-        JFrame frame = new JFrame();
-        frame.setSize(1300,720);
-        ImageIcon flatSVGIcon = new FlatSVGIcon("static/icon.svg");
-        frame.setIconImage(flatSVGIcon.getImage());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setUndecorated(true);
-        frame.setBackground(new Color(0,0,0,0));
-        {
-            MainPanel mainPanel = new MainPanel();
-            frame.setContentPane(mainPanel);
 
-            mainPanel.add(new TitlePanel(frame),BorderLayout.NORTH);
-
-            mainPanel.add(
-                    new BorderContainer(new FunctionPanel(),8)
-                            .up(0)
-                            .getPanel()
-                    , BorderLayout.WEST);
-
-            JPanel tempPanel = new JPanel(new BorderLayout());
-            tempPanel.setBackground(Settings.COLOR_TRANSPARENT);
-            mainPanel.add(tempPanel, BorderLayout.CENTER);
-
-            tempPanel.add(new ContentPanel(), BorderLayout.CENTER);
-
-        }
-
-        frame.setVisible(true);
-    }
 }

@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS token (
+    id INTEGER PRIMARY KEY,
+    token TEXT
+);
+
+CREATE TABLE IF NOT EXISTS user (
+    id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    gender TEXT,
+    signature TEXT,
+    avatar TEXT
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT NOT NULL,
+    sender INTEGER NOT NULL,
+    receiver INTEGER NOT NULL,
+    timestamp LONG NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS friend (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user INTEGER NOT NULL,
+    friend INTEGER NOT NULL
+)
